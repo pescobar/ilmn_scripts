@@ -1,0 +1,60 @@
+#!/usr/bin/python
+import sys,os,tempfile
+hostname=sys.argv[1]
+overcommit=7 # DEFAULT VALUE
+
+skip_list=["load_values","processors"]
+
+for i in os.popen("qhost -F -h '"+hostname+"'"):
+  i=i.strip()
+  if i.find("hl:mem_total")==0:
+    mem=i.split("=")[1]
+    if mem[-1]=="G" :
+      mem=int(float(mem[:-1]))
+if not( mem > 0 ):
+  raise Exception
+
+
+out=[]
+s=""
+for i in os.popen("qconf -se '"+hostname+"'"):
+  i=i.strip()
+  if not i: continue
+  if i[-1]=="\\":
+    s=s+i[:-1]
+    continue
+  s=s+i
+  out.append(s)
+  s=""
+
+F=tempfile.NamedTemporaryFile()
+for i in out:
+  item=i.split()[0]
+  if item in skip_list:
+     continue
+  values=i[len(item):].strip()
+  if item=="complex_values":
+    complexes={}
+    for complex_pair in values.split(","):
+      if complex_pair=="NONE":
+        break # for
+      complex,value=complex_pair.split("=")
+      complexes[complex]=value
+    #
+    # here we override prev values
+    #
+    complexes["h_vmem"]=str(mem+overcommit)+"G"
+    complexes["default_req"]="9999"
+    #
+    complex_list=[]
+    for j in complexes:
+      complex_list.append(j+"="+complexes[j] )
+
+    i=item+"  "+ ",".join(complex_list)
+    #
+  F.write(i+"\n")
+F.flush()
+os.system("cat '"+F.name+"'")
+#os.system("qconf -Me '"+F.name+"'")
+F.close()
+

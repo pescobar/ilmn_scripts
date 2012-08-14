@@ -1,0 +1,21 @@
+modules {
+  module {
+    name = "sge_slots"
+    language = "python"
+  }
+}
+
+collection_group {
+  collect_every = 30
+  time_threshold = 60
+  metric {
+    name = "slots_total"
+    title = "SGE Total Slots"
+    value_threshold = 1000
+  }
+  metric {
+    name = "slots_used"
+    title = "SGE Slots Used"
+    value_threshold = 1000
+  }
+}
