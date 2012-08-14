@@ -1,7 +1,14 @@
+import os
 from subprocess import Popen,PIPE
 from xml.dom.minidom import parseString
 
 def parse_qstat(name):
+  os.environ["SGE_ROOT"] = "/opt/gridengine"
+  os.environ["SGE_CELL"] = "default"
+  os.environ["SGE_ARCH"] = "lx26-amd64"
+  os.environ["SGE_EXECD_PORT"] = "537"
+  os.environ["SGE_QMASTER_PORT"] = "536"
+
   ''' parse the output of qstat -f -xml to get #slots used/#slots '''
   output = Popen(["/opt/gridengine/bin/lx26-amd64/qstat","-f","-xml"], stdout=PIPE).communicate()[0]
   doc = parseString(output)
@@ -12,7 +19,7 @@ def parse_qstat(name):
     xmlData = xmlTag.replace('<','').replace('>','').replace('/','').replace(name,'').replace(name,'')
     slots = slots + int(xmlData)
 
-  return uint(slots)
+  return int(slots)
 
 def metric_init(params):
   global descriptors
