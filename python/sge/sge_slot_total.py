@@ -16,7 +16,3 @@ for item in range(elements.length):
   #print elements.item(item).toxml()
 
 print slots
-
-#xmlTag = doc.getElementsByTagName('slots_total')[0].toxml()
-#xmlData = xmlTag.replace('<slots_total>','').replace('</slots_total>','')
-#print xmlData
