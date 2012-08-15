@@ -3,6 +3,8 @@
 # and feed data to carbon (part of graphite package) for trend 
 # analysis
 
+# TODO: what trends??? :)
+
 # naming scheme: sge.qname.user.jobid.metrics
 # where metrics is all the stuff we care about
 
