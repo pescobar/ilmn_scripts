@@ -10,7 +10,7 @@ def parse_qstat(name):
   os.environ["SGE_QMASTER_PORT"] = "536"
 
   ''' parse the output of qstat -f -xml to get #slots used/#slots '''
-  output = Popen(["/opt/gridengine/bin/lx26-amd64/qstat","-f","-xml"], stdout=PIPE).communicate()[0]
+  output = Popen([os.environ["SGE_ROOT"] + "/bin/" + os.environ["SGE_ARCH"] + "/qstat","-f","-xml"], stdout=PIPE).communicate()[0]
   doc = parseString(output)
   taglist = doc.getElementsByTagName(name)
   slots = 0 
