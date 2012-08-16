@@ -2,13 +2,14 @@ import os
 from subprocess import Popen,PIPE
 from xml.dom.minidom import parseString
 
-def parse_qstat(name):
-  os.environ["SGE_ROOT"] = "/opt/gridengine"
-  os.environ["SGE_CELL"] = "default"
-  os.environ["SGE_ARCH"] = "lx26-amd64"
-  os.environ["SGE_EXECD_PORT"] = "537"
-  os.environ["SGE_QMASTER_PORT"] = "536"
+os.environ["SGE_ROOT"] = "/opt/gridengine"
+os.environ["SGE_CELL"] = "default"
+os.environ["SGE_ARCH"] = "lx26-amd64"
+os.environ["SGE_EXECD_PORT"] = "537"
+os.environ["SGE_QMASTER_PORT"] = "536"
 
+
+def parse_qstat(name):
   ''' parse the output of qstat -f -xml to get #slots used/#slots '''
   output = Popen([os.environ["SGE_ROOT"] + "/bin/" + os.environ["SGE_ARCH"] + "/qstat","-f","-xml"], stdout=PIPE).communicate()[0]
   doc = parseString(output)
