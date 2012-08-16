@@ -100,7 +100,7 @@ function graph_sgeslots_report ( &$rrdtool_graph ) {
     $rrdtool_graph['vertical-label'] = 'SGE Slots';
     // Fudge to account for number of lines in the chart legend
     $rrdtool_graph['height']        += ($size == 'medium') ? 28 : 0;
-    $rrdtool_graph['upper-limit']    = '100';
+    // $rrdtool_graph['upper-limit']    = '100';
     $rrdtool_graph['lower-limit']    = '0';
     $rrdtool_graph['extras']         = '--rigid';
 
