@@ -1,0 +1,26 @@
+modules {
+  module {
+    name = "sge_queues"
+    language = "python"
+  }
+}
+
+collection_group {
+  collect_every = 30
+  time_threshold = 60
+
+  # here's the problem - python script can enumerate queue list but
+  # the conf file has to have them hard-coded
+
+  metric {
+    name = "slots_total"
+    title = "SGE Total Slots"
+    value_threshold = 1000
+  }
+  metric {
+    name = "slots_used"
+    title = "SGE Slots Used"
+    value_threshold = 1000
+  }
+
+}
