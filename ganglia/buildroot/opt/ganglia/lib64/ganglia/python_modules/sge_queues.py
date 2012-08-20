@@ -1,40 +1,39 @@
 import os
 from subprocess import Popen,PIPE
 
-def parse_qstat(name):
-  ''' parse the output of qstat -g c to get queue info '''
-  output = os.popen("/opt/gridengine/bin/lx26-amd64/qstat -g c")
-  #output = Popen(["/opt/gridengine/bin/lx26-amd64/qstat","-g","c"], stdout=PIPE).communicate()[0]
-  for i in output:
-    print i
-    foo = i.split
+queues = str.split(Popen([os.environ["SGE_ROOT"] + "/bin/" + os.environ["SGE_ARCH"] + "/qconf","-sql"], stdout=PIPE).communicate()[0])
+os.environ["SGE_ROOT"] = "/opt/gridengine"
+os.environ["SGE_CELL"] = "default"
+os.environ["SGE_ARCH"] = "lx26-amd64"
+os.environ["SGE_EXECD_PORT"] = "537"
+os.environ["SGE_QMASTER_PORT"] = "536"
 
-  return 12
+
+def parse_qstat(name):
+  p1 = Popen([os.environ["SGE_ROOT"] + "/bin/" + os.environ["SGE_ARCH"] + "/qstat","-g","c"], stdout=PIPE)
+  p2 = Popen(["awk", "/" + name + "/{print $3}"], stdin=p1.stdout, stdout=PIPE)
+  output2 = p2.communicate()[0]
+
+  return int(output2)
+
 
 def metric_init(params):
   global descriptors
+  global queues
 
-  d1 = {'name' : 'slots_total',
-    'call_back' : parse_qstat,
-    'time_max' : 90,
-    'value_type': 'uint',
-    'units': 'slots',
-    'slope': 'both',
-    'format': '%d',
-    'description': 'Total # Slots',
-    'groups': 'SGE'}
+  descriptors = []
+  for q in queues:
+    descriptors.append({'name' : q,
+      'call_back' : parse_qstat,
+      'time_max' : 90,
+      'value_type': 'uint',
+      'units': 'slots',
+      'slope': 'both',
+      'format': '%d',
+      'description': 'devel.q',
+      'groups': 'SGE'})
 
-  d2 = {'name' : 'slots_used',
-    'call_back' : parse_qstat,
-    'time_max' : 90,
-    'value_type': 'uint',
-    'units': 'slots',
-    'slope': 'both',
-    'format': '%d',
-    'description': 'Slots in use',
-    'groups': 'SGE'}
-
-  descriptors = [ d1, d2 ]
+  #descriptors = [ d1 ]
 
   return descriptors
 
