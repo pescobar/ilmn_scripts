@@ -1,6 +1,10 @@
 #!/bin/bash
+#$ -cwd
+#$ -M thartmann@illumina.com
+#$ -m be
+#$ -j y
 
-. /etc/profile.d/sge-binaries.sh
-
-HOST=`hostname`
-qmod -d prod-s.q@$HOST
+echo `hostname`
+echo `date`
+sleep 60
+echo `date`
