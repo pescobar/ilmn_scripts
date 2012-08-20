@@ -1,5 +1,5 @@
 Summary: custom gmond metrics for Illumina
-Name: ilmn_gmond_metrics.spec
+Name: ilmn_gmond_metrics
 Version: 1
 Release: 1
 Group: System Environment/Base
