@@ -4,7 +4,7 @@ from subprocess import Popen,PIPE
 from socket import socket
 
 # Carbon
-CARBON_SERVER='10.1.1.4'
+CARBON_SERVER='10.12.36.90'
 CARBON_PORT=2003
 delay=10
 
@@ -29,11 +29,11 @@ def parse_qstat(name):
 
   return (cqload, used, res, avail, total, queued)
 
-#sock = socket()
-#try:
-  #sock.connect( (CARBON_SERVER,CARBON_PORT) )
-#except:
-  #print "Coudln't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
+sock = socket()
+try:
+  sock.connect( (CARBON_SERVER,CARBON_PORT) )
+except:
+  print "Coudln't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
 
 # graphite
 while True:
@@ -50,9 +50,9 @@ while True:
     lines.append("sge." + hostname + "." + q + ".res %s %d" % (res,now))
     lines.append("sge." + hostname + "." + q + ".avail %s %d" % (avail,now))
     lines.append("sge." + hostname + "." + q + ".total %s %d" % (total,now))
-    lines.append("sge." + hostname + "." + q + ".queued %s %d" % (queued,now))
+    #lines.append("sge." + hostname + "." + q + ".queued %s %d" % (queued,now))
     message = '\n'.join(lines) + '\n'
     print message 
-    #sock.sendall(message)
+    sock.sendall(message)
 
   time.sleep(delay)
