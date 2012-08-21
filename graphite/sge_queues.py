@@ -23,8 +23,7 @@ def parse_qstat(name):
   if cqload == "-NA-":
     cqload = 0.00
 
-  #print "queue = %s, cqload = %s, used = %s, res = %s, avail = %s, total = %s" % (queue, cqload, used, res, avail, total)
-  return (used,res,avail,total)
+  return (cqload, used, res, avail, total)
 
 #sock = socket()
 #try:
@@ -34,13 +33,20 @@ def parse_qstat(name):
 
 # graphite
 while True:
+  hostname = os.environ["HOSTNAME"]
   now = int( time.time() )
   queues = str.split(Popen([os.environ["SGE_ROOT"] + "/bin/" + os.environ["SGE_ARCH"] + "/qconf","-sql"], stdout=PIPE).communicate()[0])
   for q in queues:
-    (u,r,a,t) = parse_qstat(q)
+    lines = []
+    (cqload, used,res,avail,total) = parse_qstat(q)
     q = q.replace(".","")
-    message = "sge." + q + " %s %d" % (u,now) + "\n"
-    print message + "\n"
+    lines.append("sge." + hostname + "." + q + ".cqload %s %d" % (cqload,now))
+    lines.append("sge." + hostname + "." + q + ".used %s %d" % (used,now))
+    lines.append("sge." + hostname + "." + q + ".res %s %d" % (res,now))
+    lines.append("sge." + hostname + "." + q + ".avail %s %d" % (avail,now))
+    lines.append("sge." + hostname + "." + q + ".total %s %d" % (total,now))
+    message = '\n'.join(lines) + '\n'
+    print message 
     #sock.sendall(message)
 
   time.sleep(delay)
