@@ -20,16 +20,20 @@ def parse_qstat(name):
   p2 = Popen(["grep", name ], stdin=p1.stdout, stdout=PIPE)
   [ queue, cqload, used, res, avail, total, aoacds, cdsue ] = str.split(p2.communicate()[0])
 
+  p3 = Popen([os.environ["SGE_ROOT"] + "/bin/" + os.environ["SGE_ARCH"] + "/qstat","-s","h","-u","*"], stdout=PIPE)
+  p4 = Popen(["wc","-l"], stdin=p3.stdout, stdout=PIPE)
+  queued = int(p4.communicate()[0])
+
   if cqload == "-NA-":
     cqload = 0.00
 
-  return (cqload, used, res, avail, total)
+  return (cqload, used, res, avail, total, queued)
 
 #sock = socket()
 #try:
-#  sock.connect( (CARBON_SERVER,CARBON_PORT) )
+  #sock.connect( (CARBON_SERVER,CARBON_PORT) )
 #except:
-#  print "Coudln't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
+  #print "Coudln't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
 
 # graphite
 while True:
@@ -39,13 +43,14 @@ while True:
   queues = str.split(Popen([os.environ["SGE_ROOT"] + "/bin/" + os.environ["SGE_ARCH"] + "/qconf","-sql"], stdout=PIPE).communicate()[0])
   for q in queues:
     lines = []
-    (cqload, used,res,avail,total) = parse_qstat(q)
+    (cqload, used,res,avail,total,queued) = parse_qstat(q)
     q = q.replace(".","_")
     lines.append("sge." + hostname + "." + q + ".cqload %s %d" % (cqload,now))
     lines.append("sge." + hostname + "." + q + ".used %s %d" % (used,now))
     lines.append("sge." + hostname + "." + q + ".res %s %d" % (res,now))
     lines.append("sge." + hostname + "." + q + ".avail %s %d" % (avail,now))
     lines.append("sge." + hostname + "." + q + ".total %s %d" % (total,now))
+    lines.append("sge." + hostname + "." + q + ".queued %s %d" % (queued,now))
     message = '\n'.join(lines) + '\n'
     print message 
     #sock.sendall(message)
