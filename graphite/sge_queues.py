@@ -34,12 +34,13 @@ def parse_qstat(name):
 # graphite
 while True:
   hostname = os.environ["HOSTNAME"]
+  hostname = hostname.replace(".","_")
   now = int( time.time() )
   queues = str.split(Popen([os.environ["SGE_ROOT"] + "/bin/" + os.environ["SGE_ARCH"] + "/qconf","-sql"], stdout=PIPE).communicate()[0])
   for q in queues:
     lines = []
     (cqload, used,res,avail,total) = parse_qstat(q)
-    q = q.replace(".","")
+    q = q.replace(".","_")
     lines.append("sge." + hostname + "." + q + ".cqload %s %d" % (cqload,now))
     lines.append("sge." + hostname + "." + q + ".used %s %d" % (used,now))
     lines.append("sge." + hostname + "." + q + ".res %s %d" % (res,now))
