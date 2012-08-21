@@ -1,5 +1,16 @@
 type=Single
 ptype=RegExp
 pattern=job (\d+\.\d) failed on host (.*)\.local general opening input\/output file because.*Permission denied
+<<<<<<< HEAD
+desc=clearing job $1 on host $2
+action=logonly;shellcmd /bin/bash -c ". /etc/profile.d/sge-binaries.sh && qmod -cj $1"
+
+type=Single
+ptype=RegExp
+pattern=root@uscp-prd-qm01.local cleared error state of job
+desc=$0
+action=pipe '%t %s' /bin/mail -s 'SEC uscp-prd-qm01' thartmann@illumina.com
+=======
 desc=clearing job $1 on host $2 due to permission denied error on stdout file
 action=logonly;shellcmd /bin/bash -c ". /etc/profile.d/sge-binaries.sh && qmod -cj $1";pipe '%t: %s' /bin/mail -s 'SEC uscp-prd-qm01' thartmann@illumina.com
+>>>>>>> 6fed96b33981cf930e088dfaedf704a2f9cd90d4
