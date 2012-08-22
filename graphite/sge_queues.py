@@ -42,11 +42,11 @@ while True:
     lines = []
     (cqload, used, res, avail, total) = parse_qstat(q)
     q = q.replace(".","_")
-    lines.append("sge." + hostname + "." + q + ".cqload %s %d" % (cqload,now))
-    lines.append("sge." + hostname + "." + q + ".used %s %d" % (used,now))
-    lines.append("sge." + hostname + "." + q + ".res %s %d" % (res,now))
-    lines.append("sge." + hostname + "." + q + ".avail %s %d" % (avail,now))
-    lines.append("sge." + hostname + "." + q + ".total %s %d" % (total,now))
+    lines.append("sge." + hostname + ".queue." + q + ".cqload %s %d" % (cqload,now))
+    lines.append("sge." + hostname + ".queue." + q + ".used %s %d" % (used,now))
+    lines.append("sge." + hostname + ".queue." + q + ".res %s %d" % (res,now))
+    lines.append("sge." + hostname + ".queue." + q + ".avail %s %d" % (avail,now))
+    lines.append("sge." + hostname + ".queue." + q + ".total %s %d" % (total,now))
     message = '\n'.join(lines) + '\n'
     print message 
     sock.sendall(message)
