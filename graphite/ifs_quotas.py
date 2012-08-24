@@ -7,7 +7,7 @@ from socket import socket
 # Carbon
 CARBON_SERVER='10.12.36.90'
 CARBON_PORT=2003
-delay=60
+delay=600
 
 sock = socket()
 try:
