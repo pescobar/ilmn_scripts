@@ -8,6 +8,13 @@ CARBON_SERVER='10.12.36.90'
 CARBON_PORT=2003
 delay=60
 
+sock = socket()
+try:
+  sock.connect( (CARBON_SERVER,CARBON_PORT) )
+except:
+  print "Couldn't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
+  sys.exit(1)
+
 # SGE
 os.environ["SGE_ROOT"] = "/opt/gridengine"
 os.environ["SGE_CELL"] = "default"
@@ -24,13 +31,6 @@ def parse_qstat(name):
     cqload = 0.00
 
   return (cqload, used, res, avail, total)
-
-sock = socket()
-try:
-  sock.connect( (CARBON_SERVER,CARBON_PORT) )
-except:
-  print "Couldn't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
-  sys.exit(1)
 
 # graphite
 while True:
