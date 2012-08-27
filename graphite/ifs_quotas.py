@@ -63,7 +63,7 @@ def getQuotas(dir):
     hard = hard.replace('K','')
     hard = float(hard)
     hard = hard * 1024
-  elif hard.find('N/A'):
+  elif hard == "N/A":
     hard = 0
 
   if used.find('T') > 0:
