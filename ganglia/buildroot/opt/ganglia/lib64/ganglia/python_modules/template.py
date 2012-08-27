@@ -2,7 +2,7 @@
 
 
 def handler(name):
-  ''' parse the output of qstat -f -xml to get #slots used/#slots '''
+  """return some data for name"""
   if name == 'data1':
     return 12
   if name == 'data2':
@@ -36,7 +36,7 @@ def metric_init(params):
   return descriptors
 
 def metric_cleanup():
-  '''Clean up the metric module.'''
+  """Clean up the metric module."""
   pass
 
 # debugging 
