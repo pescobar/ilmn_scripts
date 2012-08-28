@@ -22,6 +22,8 @@ def metric_init(params):
   global queues
 
   descriptors = []
+  # works nice but unfortunately to use this as a ganglia metric
+  # the list of metrics (queues in this case) has to be hard-coded in a .pyconf file
   for q in queues:
     descriptors.append({'name' : q,
       'call_back' : parse_qstat,
@@ -32,8 +34,6 @@ def metric_init(params):
       'format': '%d',
       'description': 'devel.q',
       'groups': 'SGE'})
-
-  #descriptors = [ d1 ]
 
   return descriptors
 
