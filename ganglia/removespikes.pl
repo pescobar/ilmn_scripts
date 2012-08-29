@@ -15,6 +15,7 @@
 #                    Use "strict" mode
 #  - 2006/01/12 - vins@terra.es - "$!" takes other values in some perl interpreters (e.g. FreeBSD 4.11-R). Thanks to Atle Veka!
 #
+# - 2012/08/29 - thartmann@illumina.com - it looks like it's only the Rocks version of rrdtool (dump) that leaves out the spaces between the <v> tags and the data. Nice! One more reason to hate Rocks
 
 use strict;
 use Getopt::Std;
