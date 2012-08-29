@@ -30,8 +30,14 @@ def parse_rockscmd():
 if __name__ == '__main__':
   #print "wwsh node new %s --netdev=%s --hwaddr=%s --ipaddr=%s --netmask=%s" % (host,iface,mac,ip,nm)
   d2 = parse_rockscmd()
-  for k, v in d2.iteritems():
-    a = d2[k]
-    #print k, v
-    print "wwsh node new %s --netdev=%s --hwaddr=%s --ipaddr=%s --netmask=%s" % (k,a[0],a[1],a[2],a[3])
-    print "wwsh node set %s --netdev=%s --hwaddr=%s --ipaddr=%s --netmask=%s" % (k,a[4],a[5],a[6],a[7])
+  i = 0
+  for hostname,data in d2.iteritems():
+    while data:
+      netdev = data.pop(0)
+      hwaddr = data.pop(0)
+      ipaddr = data.pop(0)
+      netmask = data.pop(0)
+      if netdev == "eth0":
+        print "wwsh node new %s --netdev=%s --hwaddr=%s --ipaddr=%s --netmask=%s" % (hostname,netdev,hwaddr,ipaddr,netmask)
+      else:
+        print "wwsh node set %s --netdev=%s --hwaddr=%s --ipaddr=%s --netmask=%s" % (hostname,netdev,hwaddr,ipaddr,netmask)
