@@ -2,8 +2,7 @@ import sys
 import re
 import socket
 
-#dhcpd_conf = "/etc/dhcp/dhcpd.conf"
-dhcpd_conf = "/u/tjhartma/scripts/warewulf/dhcpd.conf"
+dhcpd_conf = "/etc/dhcpd.conf"
 
 def parse_isc(dhcpd_conf):
   """ parse isc dhcpd.conf """
@@ -18,7 +17,7 @@ def parse_isc(dhcpd_conf):
     m = re.match(r'\s+hardware ethernet (\w\w:\w\w:\w\w:\w\w:\w\w:\w\w);', line)
     if m:
       mac = m.group(1)
-    m = re.match(r'\s+fixed-address\s+(n\d\d\d).hw2\.nas\.nasa\.gov', line)
+    m = re.match(r'\s+option host-name\s"(.*.local)', line)
     if m:
       host = m.group(1)
       list[mac] = host
