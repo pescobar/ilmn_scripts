@@ -1,19 +1,14 @@
+#!/usr/bin/env python
 import os
 import time
 from subprocess import Popen,PIPE
 from socket import socket
+import daemon
 
 # Carbon
 CARBON_SERVER='10.12.36.90'
 CARBON_PORT=2003
 delay=60
-
-sock = socket()
-try:
-  sock.connect( (CARBON_SERVER,CARBON_PORT) )
-except:
-  print "Couldn't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
-  sys.exit(1)
 
 # SGE
 try:
@@ -30,6 +25,10 @@ sge_root = os.environ["SGE_ROOT"]
 sge_cell = os.environ["SGE_CELL"]
 sge_arch = os.environ["SGE_ARCH"]
 
+# daemonize
+d = daemon.DaemonContext()
+d.open()
+
 def parse_qstat(name):
   p1 = Popen([sge_root + "/bin/" + sge_arch + "/qstat","-g","c"], stdout=PIPE)
   p2 = Popen(["grep", name ], stdin=p1.stdout, stdout=PIPE)
@@ -42,6 +41,13 @@ def parse_qstat(name):
 
 # graphite
 while True:
+  sock = socket()
+  try:
+    sock.connect( (CARBON_SERVER,CARBON_PORT) )
+  except:
+    print "Couldn't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
+    sys.exit(1)
+
   hostname = os.environ["HOSTNAME"]
   hostname = hostname.replace(".","_")
   now = int( time.time() )
@@ -56,6 +62,6 @@ while True:
     lines.append("sge." + hostname + ".queue." + q + ".avail %s %d" % (avail,now))
     lines.append("sge." + hostname + ".queue." + q + ".total %s %d" % (total,now))
     message = '\n'.join(lines) + '\n'
-    print message 
-    sock.sendall(message)
+    print message
+    sock.send(message)
   time.sleep(delay)
