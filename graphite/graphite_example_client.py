@@ -40,11 +40,11 @@ def get_loadavg():
     return output[length - 3:length]
 
 #sock = socket()
-#try:
-  #sock.connect( (CARBON_SERVER,CARBON_PORT) )
-#except:
-  #print "Couldn't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
-  #sys.exit(1)
+try:
+  sock.connect( (CARBON_SERVER,CARBON_PORT) )
+except:
+  print "Couldn't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
+  sys.exit(1)
 
 while True:
   now = int( time.time() )

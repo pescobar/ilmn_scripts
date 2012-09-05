@@ -62,6 +62,5 @@ while True:
     lines.append("sge." + hostname + ".queue." + q + ".avail %s %d" % (avail,now))
     lines.append("sge." + hostname + ".queue." + q + ".total %s %d" % (total,now))
     message = '\n'.join(lines) + '\n'
-    print message
     sock.send(message)
   time.sleep(delay)
