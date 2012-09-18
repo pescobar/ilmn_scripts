@@ -1,0 +1,3 @@
+# root: ukch-hpc-mon1
+@reboot /illumina/GIS/tools/start_autoDeleteD
+01 12 * * * /illumina/GIS/tools/create_forAutoDeletion

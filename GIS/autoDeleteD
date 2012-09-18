@@ -1,0 +1,162 @@
+#!/usr/bin/python
+
+#
+# Settings
+#
+rootdir="/home/thartmann"
+# Where to look for forAutoDeletion directories
+#dirlist=[ "foo", "bar", "baz"]
+dirlist=[ "scratch/*"]
+# How often we do directory scan
+check_interval=600 # seconds
+# How many deletes can run simultaneously
+max_deletes_total=8
+# How many deletes per directory can run simultaneously
+max_deletes_per_dir=2
+
+debug=True
+dry_run=False
+# 
+# end settings
+#
+
+import os,glob,time,threading,sys
+
+inprogress={}
+targets={}
+task_count=0
+lock = threading.Lock()
+
+def log(s):
+  sys.stdout.write(time.asctime()+":"+s+"\n")
+  sys.stdout.flush()
+
+def loge(s):
+  sys.stderr.write('ERROR '+time.asctime()+":"+s+"\n")
+  sys.stderr.flush()
+
+
+def logd(s):
+  if debug:
+    sys.stdout.write('DEBUG '+time.asctime()+":"+s+"\n")
+    sys.stdout.flush()
+
+
+def scandir(dir):
+  # Needs to be called within locked section
+  #print "scandir",dir
+
+  if dir in targets:
+    if len(targets[dir]) > max_deletes_per_dir*2:
+      # We already have this one populated well enough
+      return
+
+  l=os.listdir(dir)
+  if l:
+    if not dir in targets:
+      targets[dir]={}
+    for i in l:
+      f=os.path.join(dir,i )
+      if not i in targets[dir]:
+        log( "queue  "+f)
+        targets[dir][i]=True
+
+
+
+def scheduler():
+  logd( "scheduler" )
+  global task_count
+  lock.acquire()
+  try:
+    if task_count < max_deletes_total:
+      for i in targets:
+        if not i in inprogress:
+          inprogress[i]={}
+        for j in range(1,max_deletes_per_dir+1):
+          if len(inprogress[i]) < j:
+            for target in targets[i]:
+              if not target in inprogress[i]:
+                inprogress[i][target]=True
+                # we start the actual process to do the delete in a separate
+                # thread
+                t=cleaner(i,target)
+                t.start()
+                # Thread will reduce task count and targets itself
+                # once it's finished with deletion 
+                task_count=task_count+1
+              if len(inprogress[i]) >= max_deletes_per_dir or task_count >= max_deletes_total:   
+                break
+          if task_count >= max_deletes_total:
+            break  
+  finally:
+    lock.release()
+  
+
+class cleaner(threading.Thread):
+  def __init__(self,dir,name):
+    threading.Thread.__init__(self)
+    self.dir=dir
+    self.name=name
+
+
+  def run(self):
+    global task_count
+    dir=self.dir
+    name=self.name
+
+    # Quote string for shell $' ' -quotes
+    fname=""
+    for i in os.path.join(dir,name):
+      # these are absolute pathnames otherwise '-' wouldn't be safe
+      if i.isalnum() or i in [".","_","/","-" ] :
+        fname=fname+i
+      else:
+         fname=fname+'\\'+( "%03o" % ord(i) )
+
+    # double safety check
+    try:
+      if fname[0]!="/" or fname.find("/forAutoDeletion/")<1 or not os.path.isdir(dir) or os.path.islink(dir):
+        raise
+      log( "remove "+fname )
+      logd( "/bin/rm -rf $'"+fname+"'" )
+      if not dry_run: os.system("/bin/rm -rf $'"+fname+"'" )
+      log( "done   "+fname )
+    except: 
+      loge("Encountered unexpected problem with pathname: '"+fname)
+
+    lock.acquire()
+    try:
+      #print dir,name
+      del targets[dir][name]
+      if not targets[dir]:
+        # last target in this directory
+        del targets[dir]     
+      # same for inprogress
+      del inprogress[dir][name]
+      if not inprogress[dir]:
+        del inprogress[dir]
+      task_count=task_count-1
+    finally:
+      lock.release()
+    # We done, call scheduler to start next task if there is any waiting
+    scheduler()
+
+
+while 1:
+  lock.acquire()
+  logd( "scanning directories" )
+  try:
+    for i in dirlist:
+      try:
+        for j in glob.glob( os.path.join(rootdir,i) ):
+          addir=os.path.join(j,"forAutoDeletion")
+          if os.path.isdir(addir) and not os.path.islink(addir):
+            scandir(addir)
+      except:
+        loge("problem processing directory" +i)
+  finally:
+    lock.release()
+  scheduler()
+      
+  logd( "sleeping "+ str(check_interval) )
+  time.sleep(check_interval)
