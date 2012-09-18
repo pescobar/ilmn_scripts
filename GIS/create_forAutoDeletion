@@ -2,8 +2,9 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
 umask 002
 shopt -s extglob
-for i in /nas_maintenance/ch-isilon/ifs/@(scratch|builds|postbuild|upload)/*
+for i in /home/thartmann/scratch/@(foo|bar|baz)
 do
+  echo "$i/forAutoDeletion"
   if [ -d "$i"  ]
   then
     adir="$i/forAutoDeletion"
