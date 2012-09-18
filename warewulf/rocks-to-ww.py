@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from subprocess import Popen,PIPE
 import re
 
@@ -43,6 +44,7 @@ if __name__ == '__main__':
 
       # key is the subnet name, value is list [netdev,mac,ip,netmask]
       subnet_data[sn] = [nd,hw,ip,nm]
+
     (netdev,hwaddr,ipaddr,netmask) = subnet_data["private"]
     print "wwsh node new %s --netdev=%s --hwaddr=%s --ipaddr=%s --netmask=%s" % (host,netdev,hwaddr,ipaddr,netmask)
     for subnet,sn_values in subnet_data.iteritems():

@@ -26,8 +26,8 @@ sge_cell = os.environ["SGE_CELL"]
 sge_arch = os.environ["SGE_ARCH"]
 
 # daemonize
-d = daemon.DaemonContext()
-d.open()
+#d = daemon.DaemonContext()
+#d.open()
 
 def parse_qstat(name):
   p1 = Popen([sge_root + "/bin/" + sge_arch + "/qstat","-g","c"], stdout=PIPE)
