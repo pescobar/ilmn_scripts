@@ -1,6 +1,6 @@
 from xml.dom.minidom import parseString
 
-# get some xml data from a website
+# get some xml data from a file
 file = open('qstatf.xml','r')
 data = file.read()
 file.close()
