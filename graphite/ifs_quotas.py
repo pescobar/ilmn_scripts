@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import time
 from subprocess import Popen,PIPE
@@ -46,7 +47,6 @@ def getQuotas(dir):
   except:
     used = "0T"
 
-  # TODO: convert human-readable to bytes (and percents?)
   if hard.find('T') > 0:
     hard = hard.replace('T','')
     hard = float(hard)
