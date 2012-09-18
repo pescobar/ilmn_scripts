@@ -1,0 +1,17 @@
+#!/bin/bash
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+umask 002
+shopt -s extglob
+for i in /nas_maintenance/ch-isilon/ifs/@(scratch|builds|postbuild|upload)/*
+do
+  if [ -d "$i"  ]
+  then
+    adir="$i/forAutoDeletion"
+    if [ ! -d "$adir" ]
+    then
+       echo "creating $adir"
+       mkdir "$adir"
+       chgrp 504 "$adir"
+    fi    
+  fi
+done
