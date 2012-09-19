@@ -3,10 +3,10 @@
 #
 # Settings
 #
-rootdir="/home/thartmann"
+rootdir="/illumina/scratch"
 # Where to look for forAutoDeletion directories
 #dirlist=[ "foo", "bar", "baz"]
-dirlist=[ "scratch/*"]
+dirlist=[ "Chimera"]
 # How often we do directory scan
 check_interval=600 # seconds
 # How many deletes can run simultaneously
@@ -14,8 +14,8 @@ max_deletes_total=8
 # How many deletes per directory can run simultaneously
 max_deletes_per_dir=2
 
-debug=True
-dry_run=False
+debug=False
+dry_run=True
 # 
 # end settings
 #
