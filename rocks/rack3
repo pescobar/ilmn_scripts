@@ -1,0 +1,13 @@
+#!/bin/bash
+
+for i in `seq 17 24`; do
+	#rocks add host bonded uscp-prd-lncn-3-${i} channel=bond0 interfaces=eth0,eth1 ip=10.128.3.1${i} network=uscp-prd-isi01b
+	#rocks set host interface options uscp-prd-lncn-7-${i} bond0 options="miimon=100 mode=0"
+	#IP=`rocks list host interface uscp-prd-lncn-3-${i} | awk '/private/{print $4}'`
+	#rocks add host bonded uscp-prd-lncn-3-${i} channel=bond1 interfaces=eth2,eth3 ip=$IP network=private
+	#rocks set host interface options uscp-prd-lncn-7-${i} bond1 options="miimon=100 mode=0"
+
+	#rocks set host interface subnet uscp-prd-lncn-3-${i} bond0 uscp-prd-isi01a
+	rocks set host interface ip uscp-prd-lncn-3-${i} bond0 10.128.1.${i}
+	rocks list host interface uscp-prd-lncn-3-${i}
+done
