@@ -3,6 +3,7 @@
 #$ -M thartmann@illumina.com
 #$ -m e
 #$ -j y
+#$ -p 1024
 
 
 # submit as an exclusive job (-pe fill_node #slots) and enable notification email
