@@ -23,16 +23,14 @@ def parse_qstat(queue_state):
   else:
     return
 
-  output = p1.communicate()[0]
-
   # output string looks something like:
   # devel.q@ussd-prd-lncn-2-14.loc BIP   0/0/8          0.00     lx26-amd64    d
+  output = p1.communicate()[0]
 
-  match = re.search(r'.*lx26-amd64.*', output)
+  # re.findall returns a list of strings
+  match = re.findall(r'.*lx26-amd64.*', output)
   if match:
-    queue_list = re.sub(r'\.lo.*', '', match.group(0))
-    #return (re.sub(r'\@', '_', queue_list))
-    return (queue_list)
+    return (match)
   else:
     return
 
@@ -42,12 +40,12 @@ def parse_qstat(queue_state):
 # where status: 0 = OK, 1 = WARNING, 2 = CRITICAL, 3 = UNKNOWN
 disabled = parse_qstat("disabled")
 if disabled:
-  dqueue = disabled.split()
-  for queue in dqueue:
-    print "1 SGE_disabled-%s - SGE queue %s is disabled" % (queue,queue)
+  for queue in disabled:
+    queue_name = re.sub(r'\.lo.*', '', queue)
+    print "1 SGE_disabled-%s - SGE queue %s is disabled" % (queue_name,queue_name)
 
-alarm = parse_qstat("alarm")
-if alarm:
-  aqueue= alarm.split()
-  for queue in aqueue:
-    print "2 SGE_alarm-%s - SGE queue %s is in alarm" % (queue,queue)
+#alarm = parse_qstat("alarm")
+#if alarm:
+  #aqueue= alarm.split()
+  #for queue in aqueue:
+    #print "2 SGE_alarm-%s - SGE queue %s is in alarm" % (queue,queue)
