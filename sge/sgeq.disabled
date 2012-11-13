@@ -14,6 +14,22 @@ os.environ["SGE_EXECD_PORT"] = "537"
 os.environ["SGE_QMASTER_PORT"] = "536"
 
 
+# check_mk requires these functions
+# inventory function
+def inventory_sge_disabled(checkname, info):
+  print info
+  return []
+
+# check function
+def check_sge_disabled(item, params, info):
+  return (3, "Sorry - not implemented")
+
+# declare the check to Check_MK
+check_info['sgeq.disabled'] = \
+  (check_sge_disabled, "Queue %s",0, inventory_sge_disabled)
+
+
+
 # check_mk_agent closes stdin which breaks this python construct - how to get around that?
 def parse_qstat(queue_state):
   if(queue_state == "disabled"):
