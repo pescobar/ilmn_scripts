@@ -1,0 +1,4 @@
+# search AD ldap using my own credentials
+# -x disables SASL, -H is the Domain Controller, -b is base DN
+# -D is bind DN, -W prompts for password
+ldapsearch -x -H ldap://10.10.48.5:3268 -b 'dc=illumina,dc=com' -D 'ILLUMINA\thartmann' '(samaccountname=knobuta)' -W
