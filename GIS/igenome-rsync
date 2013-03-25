@@ -1,0 +1,16 @@
+#!/bin/bash
+
+DEBUG=0
+SOURCE='ussd-prd-qm02.illumina.com::igenomes/'
+DESTINATION='/illumina/scratch/iGenomes/'
+LOGFILE='/var/log/rsync-igenomes.log'
+
+if [ $DEBUG -eq 1 ]
+then
+  OPTIONS="-av --dry-run --delete --delete-excluded --exclude="*temp/""
+else
+  OPTIONS="-av --delete --delete-excluded --exclude="*temp/""
+fi
+  
+
+/usr/bin/rsync $OPTIONS $LOGFILE $SOURCE $DESTINATION >/dev/null 2>&1
