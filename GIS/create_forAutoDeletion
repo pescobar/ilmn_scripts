@@ -2,7 +2,7 @@
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
 umask 002
 shopt -s extglob
-for i in /illumina/scratch/Chimera
+for i in /illumina/scratch/@(Chimera|TRex)
 do
   if [ -d "$i"  ]
   then

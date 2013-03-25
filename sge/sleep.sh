@@ -6,5 +6,5 @@
 
 echo `hostname`
 echo `date`
-sleep 10
+sleep 90
 echo `date`
