@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DEBUG=1
+DEBUG=0
 SOURCE='ussd-prd-qm02.illumina.com::igenomes/'
 DESTINATION='/illumina/scratch/iGenomes/'
 LOGFILE='/var/log/rsync-igenomes.log'
