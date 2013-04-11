@@ -34,31 +34,34 @@ dmidecode
 shadow-utils
 vim-minimal
 vim-common
+openssh-clients
+which
 
 # custom utils from illumina repo
 ilmn_megacli
+dell-pec-bmc-tool
+dell-pec-setupbios
+dell-pec-ipmiflash
+dell-pec-ldstate
+dell-pec-pecagent
 
 %post --interpreter /bin/bash
 /sbin/chkconfig ipmi on
 
-cat << __HERE__ >> /root/config_node.sh
-# configure the LSI RAID controller during boot
+cat << __HERE__ >> /etc/rc.local
+# configure the LSI RAID 
 /usr/bin/MegaCli -CfgClr -a0
 /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -sz100GB -a0
 /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -a0
 
-# idracadm/omconfig doesn't work on c6xxx series...and neither does syscfg
-# use ipmitool here? or later e.g. in puppet?
-# advantage puppet - more facts available for e.g. setting static IP, registering with DNS, etc.
-
-# cobbler-register utility from koan package - need to establish UID for hostname
-#   dmidecode -s system-serial-number should work, but c6100 chassis report same for all 4 nodes in chassis
-#   dmidecode -s chassis-serial-number should work, but c6100 chassis report same for all 4 nodes in chassis
-#   dmidecode -s system-uuid should work, but c6100 chassis report same for all 4 nodes in chassis
-#   essentially leaves us with MAC address of eth0...
-
-FQDN=`ifconfig eth0 | awk '/HWaddr/{print $5}' | sed 's/://g'`
-cobbler-register -b -s $HOSTNAME -f \$FQDN -p gluster
+# Configure BIOS and BMC settings
+/opt/dell/pec/bmc nic_mode set dedicated
+/opt/dell/pec/bmc set_chassis_power_cap disable
+/opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
+/opt/dell/pec/setupbios setting set ioat_dma_engine enabled
+#/opt/dell/pec/bmc attr set dns_dhcp_enable 1
+#/opt/dell/pec/bmc attr set dns_get_domain_from_dhcp 1
+#/opt/dell/pec/bmc attr set dns_register_bmc 1
 
 __HERE__
 %end
