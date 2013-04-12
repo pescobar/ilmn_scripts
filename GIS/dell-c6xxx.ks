@@ -65,23 +65,5 @@ cat << '__HERE__' > /etc/rc.local
 /opt/dell/pec/bmc set_chassis_power_cap disable
 /opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
 /opt/dell/pec/setupbios setting set ioat_dma_engine enabled
-
-# open question - DHCP or static?
-# if we control our own DHCP/DNS then DHCP _might_ be better
-# if static - where do we set the IP - prep or puppet?
-# if DHCP - how and where do we set the bmc name?
-#/opt/dell/pec/bmc attr set dns_dhcp_enable 1
-#/opt/dell/pec/bmc attr set dns_get_domain_from_dhcp 1
-#/opt/dell/pec/bmc attr set dns_register_bmc 1
-#/usr/bin/ipmitool lan set 1 ipsrc static
-#/usr/bin/ipmitool lan set 1 ipaddr <x.x.x.x>
-#/usr/bin/ipmitool lan set 1 netmask <x.x.x.x>
-#/usr/bin/ipmitool lan set 1 defgw ipaddr <x.x.x.x>
-#/usr/bin/ipmitool lan set 1 password <password>
-
-# another open question - cobbler-register or SEC?
-FQDN=`ifconfig eth0 | awk '/HWaddr/{print $5}' | sed 's/://g'`
-cobbler-register -s 10.1.1.2 -f $FQDN -P gluster
-
 __HERE__
 %end
