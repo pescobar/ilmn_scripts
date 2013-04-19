@@ -1,7 +1,8 @@
 #!/bin/bash
 #$ -cwd
 #$ -M thartmann@illumina.com
-#$ -m be
+# #$ -m be
+#$ -o /dev/null
 #$ -j y
 
 echo `hostname`
