@@ -6,9 +6,11 @@ def register():
 def run(api, args, logger):
   objtype = args[0]
   name    = args[1]
-  ip      = args[2]
+  bootip  = args[2]
 
-
+  #########################################################
+  # generate a new node name
+  #########################################################
   # this assumes nodes are alphabetically sorted in h.systems()
   # appears to be a valid assumption, but may change in future
   stack = []
@@ -26,13 +28,22 @@ def run(api, args, logger):
 
   fqdn = newname + ".foo.illumina.com"
 
+  ########################################################
+  # assign a static IP address
+  ########################################################
+  # TODO
+
+
+  ###############################################
+  # configure the new node
+  # and set it to boot into kickstart
+  ###############################################
   system = api.find_system(name)
-  system.set_hostname(newname)
+  system.set_hostname(fqdn)
   system.set_dns_name(fqdn,'eth0')
   system.set_comment('firstboot_trigger')
   system.set_netboot_enabled('True')
-  api.rename_system(system,newname)
+  api.rename_system(system,fqdn)
   api.serialize()
+  api.sync()
   return 0
-
-
