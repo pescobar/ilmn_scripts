@@ -51,37 +51,21 @@ dell-pec-ipmiflash
 dell-pec-ldstate
 dell-pec-pecagent
 
-%post --interpreter /bin/bash
+%post
+
 /sbin/chkconfig ipmi on
 
 cat << '__HERE__' > /etc/rc.local
-# configure the LSI RAID 
-/usr/bin/MegaCli -CfgClr -a0
-/usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -sz100GB -a0
-/usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -a0
 
-# Configure BIOS and BMC settings
-/opt/dell/pec/bmc nic_mode set dedicated
-/opt/dell/pec/bmc set_chassis_power_cap disable
-/opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
-/opt/dell/pec/setupbios setting set ioat_dma_engine enabled
-
-# open question - DHCP or static?
-# if we control our own DHCP/DNS then DHCP _might_ be better
-# if static - where do we set the IP - prep or puppet?
-# if DHCP - how and where do we set the bmc name?
-#/opt/dell/pec/bmc attr set dns_dhcp_enable 1
-#/opt/dell/pec/bmc attr set dns_get_domain_from_dhcp 1
-#/opt/dell/pec/bmc attr set dns_register_bmc 1
-#/usr/bin/ipmitool lan set 1 ipsrc static
-#/usr/bin/ipmitool lan set 1 ipaddr <x.x.x.x>
-#/usr/bin/ipmitool lan set 1 netmask <x.x.x.x>
-#/usr/bin/ipmitool lan set 1 defgw ipaddr <x.x.x.x>
-#/usr/bin/ipmitool lan set 1 password <password>
-
-# another open question - cobbler-register or SEC?
+# use the MAC address of eth0 for the initial cobbler-register call
+# requires a DNS entry for 'cobbler' on the local subdomain
 FQDN=`ifconfig eth0 | awk '/HWaddr/{print $5}' | sed 's/://g'`
-cobbler-register -s 10.1.1.2 -f $FQDN -P gluster
+cobbler-register -s cobbler -f ${FQDN}.foo.illumina.com -P gluster
 
+# trigger a install/firstboot script to set netboot enable for the OS install
+# ('add' triggers are run when a system is edited, which results in a loop)
+wget -O /dev/null http://cobbler/cblr/svc/op/trig/mode/firstboot/system/${FQDN}.foo.illumina.com
+sleep 5
+reboot
 __HERE__
 %end
