@@ -1,7 +1,11 @@
 import re
 import netaddr
 
-# only user-defined value
+# /usr/lib/python2.6/site-packages/cobbler/modules/install_firstboot_discover.py
+
+# define the provisioning subnet for this cluster
+# this script assumes the gateway is the lowest host address in this range
+# and the first node will start with the highest host address in this range (ala Rocks)
 provisioning_subnet = netaddr.IPNetwork('10.1.1.0/24')
 
 def register():
@@ -40,7 +44,7 @@ def run(api, args, logger):
     last  = ip.pop()
     newip = str(last.__isub__(1))
   else:
-    newip = "10.1.1.254"
+    newip = str(list(subnet).pop().__isub__(1))
 
   netmask = str(provisioning_subnet.netmask)
   gateway = str(provisioning_subnet[1])
