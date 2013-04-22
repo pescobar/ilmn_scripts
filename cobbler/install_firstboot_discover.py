@@ -44,7 +44,7 @@ def run(api, args, logger):
     last  = ip.pop()
     newip = str(last.__isub__(1))
   else:
-    newip = str(list(subnet).pop().__isub__(1))
+    newip = str(list(provisioning_subnet).pop().__isub__(1))
 
   netmask = str(provisioning_subnet.netmask)
   gateway = str(provisioning_subnet[1])
