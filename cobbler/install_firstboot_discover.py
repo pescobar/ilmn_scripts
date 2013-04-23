@@ -7,6 +7,7 @@ import netaddr
 # this script assumes the gateway is the lowest host address in this range
 # and the first node will start with the highest host address in this range (ala Rocks)
 provisioning_subnet = netaddr.IPNetwork('10.1.1.0/24')
+subdomain = ".localdomain"
 
 def register():
   # run when called as install/firstboot
@@ -36,7 +37,7 @@ def run(api, args, logger):
   else:
     newname = "node1"
 
-  fqdn = newname + ".foo.illumina.com"
+  fqdn = newname + subdomain
 
   if len(ip) > 0:
     ip.sort()
