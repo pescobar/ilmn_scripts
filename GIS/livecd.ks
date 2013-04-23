@@ -59,12 +59,12 @@ cat << '__HERE__' > /etc/rc.local
 
 # use the MAC address of eth0 for the initial cobbler-register call
 # requires a DNS entry for 'cobbler' on the local subdomain
-FQDN=`ifconfig eth0 | awk '/HWaddr/{print $5}' | sed 's/://g'`
-cobbler-register -s cobbler -f ${FQDN}.foo.illumina.com -P gluster
+TEMP=`ifconfig eth0 | awk '/HWaddr/{print $5}' | sed 's/://g'`
+cobbler-register -s cobbler -f ${TEMP} -P gluster
 
 # trigger a install/firstboot script to set netboot enable for the OS install
 # ('add' triggers are run when a system is edited, which results in a loop)
-wget -O /dev/null http://cobbler/cblr/svc/op/trig/mode/firstboot/system/${FQDN}.foo.illumina.com
+wget -O /dev/null http://cobbler/cblr/svc/op/trig/mode/firstboot/system/${TEMP}
 sleep 5
 reboot
 __HERE__

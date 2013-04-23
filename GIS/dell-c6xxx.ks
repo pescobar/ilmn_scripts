@@ -65,5 +65,15 @@ cat << '__HERE__' > /etc/rc.local
 /opt/dell/pec/bmc set_chassis_power_cap disable
 /opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
 /opt/dell/pec/setupbios setting set ioat_dma_engine enabled
+
+TEMP=`ifconfig eth0 | awk '/HWaddr/{print $5}' | sed 's/://g'`
+cobbler-register -s cobbler -f ${TEMP} -P gluster
+
+# trigger an install/firstboot script to set netboot enable for the OS install
+# ('add' triggers are run when a system is edited, which results in a loop)
+wget -O /dev/null http://cobbler/cblr/svc/op/trig/mode/firstboot/system/${TEMP}
+sleep 5
+reboot
+
 __HERE__
 %end
