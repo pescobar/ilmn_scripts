@@ -6,6 +6,7 @@ import netaddr
 # define the provisioning subnet for this cluster
 # this script assumes the gateway is the lowest host address in this range
 # and the first node will start with the highest host address in this range (ala Rocks)
+# TODO: use bootip to determine the subnet, make this as generic as possible
 provisioning_subnet = netaddr.IPNetwork('10.1.1.0/24')
 subdomain = ".localdomain"
 
