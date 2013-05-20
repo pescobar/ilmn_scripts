@@ -6,8 +6,7 @@ import netaddr
 # define the provisioning subnet for this cluster
 # this script assumes the gateway is the lowest host address in this range
 # and the first node will start with the highest host address in this range (ala Rocks)
-# TODO: use bootip to determine the subnet, make this as generic as possible
-provisioning_subnet = netaddr.IPNetwork('10.1.1.0/24')
+# TODO: don't hardcode subdomain
 subdomain = ".localdomain"
 
 def register():
@@ -24,6 +23,9 @@ def run(api, args, logger):
   #########################################################
   nodes = []
   ip = []
+  # TODO: programatically determine the subnet mask - how???
+  sn = bootip + '/24'
+  provisioning_subnet = netaddr.IPNetwork(sn)
 
   for system in api.systems():
     m = re.match(r'node(\d+)', system.name)
