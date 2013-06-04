@@ -1,3 +1,13 @@
+# kickstart profile for livecd image to configure dell c6220
+# RAID and BIOS settings
+# 
+# To create a pxeboot-able image:
+#   livecd-creator -c dell-c6xxx.ks -f dell-c6xxx
+#   livecd-iso-to-pxeboot dell-c6xxx.iso
+#
+# This will create a tftpboot directory with a vmlinuz0 and initrd0.img file
+# suitable for PXE booting
+
 lang en_US
 keyboard us
 timezone  America/Los_Angeles
@@ -66,12 +76,6 @@ cat << '__HERE__' > /etc/rc.local
 /opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
 /opt/dell/pec/setupbios setting set ioat_dma_engine enabled
 
-TEMP=`ifconfig eth0 | awk '/HWaddr/{print $5}' | sed 's/://g'`
-cobbler-register -s cobbler -f ${TEMP} -P gluster
-
-# trigger an install/firstboot script to set netboot enable for the OS install
-# ('add' triggers are run when a system is edited, which results in a loop)
-wget -O /dev/null http://cobbler/cblr/svc/op/trig/mode/firstboot/system/${TEMP}
 sleep 5
 reboot
 
