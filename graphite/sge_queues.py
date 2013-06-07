@@ -3,12 +3,10 @@ import os
 import time
 from subprocess import Popen,PIPE
 from socket import socket
-import daemon
 
 # Carbon
-CARBON_SERVER='10.12.36.90'
+CARBON_SERVER='ussd-prd-lngr01.illumina.com'
 CARBON_PORT=2003
-delay=60
 
 # SGE
 try:
@@ -25,10 +23,6 @@ sge_root = os.environ["SGE_ROOT"]
 sge_cell = os.environ["SGE_CELL"]
 sge_arch = os.environ["SGE_ARCH"]
 
-# daemonize
-#d = daemon.DaemonContext()
-#d.open()
-
 def parse_qstat(name):
   p1 = Popen([sge_root + "/bin/" + sge_arch + "/qstat","-g","c"], stdout=PIPE)
   p2 = Popen(["grep", name ], stdin=p1.stdout, stdout=PIPE)
@@ -40,27 +34,26 @@ def parse_qstat(name):
   return (cqload, used, res, avail, total)
 
 # graphite
-while True:
-  sock = socket()
-  try:
-    sock.connect( (CARBON_SERVER,CARBON_PORT) )
-  except:
-    print "Couldn't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
-    sys.exit(1)
+sock = socket()
+try:
+  sock.connect( (CARBON_SERVER,CARBON_PORT) )
+except:
+  print "Couldn't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
+  sys.exit(1)
 
-  hostname = os.environ["HOSTNAME"]
-  hostname = hostname.replace(".","_")
-  now = int( time.time() )
-  queues = str.split(Popen([sge_root + "/bin/" + sge_arch + "/qconf","-sql"], stdout=PIPE).communicate()[0])
-  for q in queues:
-    lines = []
-    (cqload, used, res, avail, total) = parse_qstat(q)
-    q = q.replace(".","_")
-    lines.append("sge." + hostname + ".queue." + q + ".cqload %s %d" % (cqload,now))
-    lines.append("sge." + hostname + ".queue." + q + ".used %s %d" % (used,now))
-    lines.append("sge." + hostname + ".queue." + q + ".res %s %d" % (res,now))
-    lines.append("sge." + hostname + ".queue." + q + ".avail %s %d" % (avail,now))
-    lines.append("sge." + hostname + ".queue." + q + ".total %s %d" % (total,now))
-    message = '\n'.join(lines) + '\n'
-    sock.send(message)
-  time.sleep(delay)
+hostname = os.environ["HOSTNAME"]
+hostname = hostname.replace(".","_")
+now = int( time.time() )
+queues = str.split(Popen([sge_root + "/bin/" + sge_arch + "/qconf","-sql"], stdout=PIPE).communicate()[0])
+for q in queues:
+  lines = []
+  (cqload, used, res, avail, total) = parse_qstat(q)
+  q = q.replace(".","_")
+  lines.append("sge." + hostname + ".queue." + q + ".cqload %s %d" % (cqload,now))
+  lines.append("sge." + hostname + ".queue." + q + ".used %s %d" % (used,now))
+  lines.append("sge." + hostname + ".queue." + q + ".res %s %d" % (res,now))
+  lines.append("sge." + hostname + ".queue." + q + ".avail %s %d" % (avail,now))
+  lines.append("sge." + hostname + ".queue." + q + ".total %s %d" % (total,now))
+  message = '\n'.join(lines) + '\n'
+  print message
+  sock.send(message)
