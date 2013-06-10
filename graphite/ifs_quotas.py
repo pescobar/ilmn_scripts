@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 import time
 from subprocess import Popen,PIPE
 from xml.dom.minidom import parseString
@@ -8,7 +9,6 @@ from socket import socket
 # Carbon
 CARBON_SERVER='10.12.36.90'
 CARBON_PORT=2003
-delay=600
 
 sock = socket()
 try:
@@ -87,20 +87,17 @@ def getQuotas(dir):
 
 
 # graphite
-while True:
-  now = int( time.time() )
-  lines = []
-  p1 = Popen(["/usr/bin/isi","status"], stdout=PIPE)
-  p2 = Popen(["awk","/Cluster Name/{print $3}"], stdin=p1.stdout, stdout=PIPE)
-  clusterName = p2.communicate()[0]
-  clusterName = clusterName.rstrip("\n\r") # chomp
-  dirs = getDirs()
-  for d in dirs:
-    (hard,used) = getQuotas(d)
-    d = d.replace("/","_")
-    lines.append("isilon." + clusterName + "." + d + ".hard %s %d" % (hard,now))
-    lines.append("isilon." + clusterName + "." + d + ".used %s %d" % (used,now))
-    message = '\n'.join(lines) + '\n'
-    print message 
-    sock.sendall(message)
-  time.sleep(delay)
+now = int( time.time() )
+lines = []
+p1 = Popen(["/usr/bin/isi","status"], stdout=PIPE)
+p2 = Popen(["awk","/Cluster Name/{print $3}"], stdin=p1.stdout, stdout=PIPE)
+clusterName = p2.communicate()[0]
+clusterName = clusterName.rstrip("\n\r") # chomp
+dirs = getDirs()
+for d in dirs:
+  (hard,used) = getQuotas(d)
+  d = d.replace("/","_")
+  lines.append("isilon." + clusterName + "." + d + ".hard %s %d" % (hard,now))
+  lines.append("isilon." + clusterName + "." + d + ".used %s %d" % (used,now))
+  message = '\n'.join(lines) + '\n'
+  sock.sendall(message)
