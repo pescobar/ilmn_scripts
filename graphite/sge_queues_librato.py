@@ -6,10 +6,6 @@ from socket import socket
 import urllib2
 import base64
 
-# Carbon
-CARBON_SERVER='10.12.34.77'
-CARBON_PORT=2003
-
 # librato using pycurl
 username='toddjhartmann@gmail.com'
 password='82fd0bf2ef9f5b15456d739ee4e1b2558c4ce9229ff9db25ddfefa7ce55d885b'
@@ -47,29 +43,13 @@ def parse_qstat(name):
 
   return (cqload, used, res, avail, total)
 
-# graphite
-sock = socket()
-try:
-  sock.connect( (CARBON_SERVER,CARBON_PORT) )
-except:
-  print "Couldn't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
-  sys.exit(1)
-
-#hostname = os.environ["HOSTNAME"]
-hostname = "ussd-prd-qm01.illumina.com"
+hostname = os.environ["HOSTNAME"]
 hostname = hostname.replace(".","_")
 now = int( time.time() )
 queues = str.split(Popen([sge_root + "/bin/" + sge_arch + "/qconf","-sql"], stdout=PIPE).communicate()[0])
 for q in queues:
   lines = []
   (cqload, used, res, avail, total) = parse_qstat(q)
-
-  # librato
-  # data is
-  # 'measure_time=now' 
-  # 'source=blah.com'
-  # 'gauges[0][name]=name'
-  # 'gauges[0][value]=5'
   metric_name = "sge_" + q
   librato_data = 'measure_time=%s&source=%s&gauges[0][name]=%s&gauges[0][value]=%s&period=60' %  ( now, metric_name, hostname, used )
   print "librato data: %s" % librato_data
@@ -77,16 +57,3 @@ for q in queues:
                         data=librato_data)
   req.add_header("Authorization", "Basic %s" % base64string)
   f = urllib2.urlopen(req)
-
-
-  # graphite
-  q = q.replace(".","_")
-  lines.append("sge." + hostname + ".queue." + q + ".cqload %s %d" % (cqload,now))
-  lines.append("sge." + hostname + ".queue." + q + ".used %s %d" % (used,now))
-  lines.append("sge." + hostname + ".queue." + q + ".res %s %d" % (res,now))
-  lines.append("sge." + hostname + ".queue." + q + ".avail %s %d" % (avail,now))
-  lines.append("sge." + hostname + ".queue." + q + ".total %s %d" % (total,now))
-  graphite_message = '\n'.join(lines) + '\n'
-  #print graphite_message
-  #sock.send(graphite_message)
-
