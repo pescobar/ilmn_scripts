@@ -41,8 +41,7 @@ except:
   print "Couldn't connect to %(server)s on port %(port)d, is carbon-agent.py running?" % { 'server':CARBON_SERVER, 'port':CARBON_PORT }
   sys.exit(1)
 
-#hostname = os.environ["HOSTNAME"]
-hostname = "ussd-prd-qm01.illumina.com"
+hostname = os.environ["HOSTNAME"]
 hostname = hostname.replace(".","_")
 now = int( time.time() )
 queues = str.split(Popen([sge_root + "/bin/" + sge_arch + "/qconf","-sql"], stdout=PIPE).communicate()[0])
