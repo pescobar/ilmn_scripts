@@ -2,7 +2,6 @@
 import os
 import time
 from subprocess import Popen,PIPE
-from socket import socket
 import urllib2
 import base64
 
@@ -51,7 +50,11 @@ for q in queues:
   lines = []
   (cqload, used, res, avail, total) = parse_qstat(q)
   metric_name = "sge_" + q
-  librato_data = 'measure_time=%s&source=%s&gauges[0][name]=%s&gauges[0][value]=%s&period=60' %  ( now, metric_name, hostname, used )
+  try:
+    percent = int( float(used)/float(total) * 100)
+  except:
+    percent = 0
+  librato_data = 'measure_time=%s&source=%s&gauges[0][name]=%s&gauges[0][value]=%s&period=60' %  ( now, metric_name, hostname, percent )
   print "librato data: %s" % librato_data
   req = urllib2.Request(url='https://metrics-api.librato.com/v1/metrics',
                         data=librato_data)
