@@ -71,10 +71,20 @@ cat << '__HERE__' > /etc/rc.local
 /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -a0
 
 # Configure BIOS and BMC settings
-/opt/dell/pec/bmc nic_mode set dedicated
-/opt/dell/pec/bmc set_chassis_power_cap disable
-/opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
-/opt/dell/pec/setupbios setting set ioat_dma_engine enabled
+PLATFORM=`/opt/dell/pec/setupbios platform`
+if [ $PLATFORM == 'C6220' ]; then
+  /opt/dell/pec/bmc nic_mode set dedicated
+  /opt/dell/pec/bmc set_chassis_power_cap disable
+  /opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
+  /opt/dell/pec/setupbios setting set ioat_dma_engine enabled
+fi
+
+if [ $PLATFORM == 'C6100' ]; then
+  /opt/dell/pec/bmc nic_mode set dedicated
+  /opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
+  /opt/dell/pec/setupbios setting set hyperthreading_tech enabled
+  /opt/dell/pec/setupbios setting set remote_access enabled
+fi
 
 sleep 5
 reboot
