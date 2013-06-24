@@ -65,14 +65,22 @@ dell-pec-pecagent
 /sbin/chkconfig ipmi on
 
 cat << '__HERE__' > /etc/rc.local
-# Configure BIOS and BMC settings
-PLATFORM=`/opt/dell/pec/setupbios platform`
-if [ $PLATFORM == 'C6220' ]; then
-  # configure the LSI RAID 
+# configure the LSI RAID based on the # of drives (currently either 4 or 6) 
+NUMDRIVES=`/illumina/GIS/tools/MegaCli -ldinfo -lall -a0 | awk -F ":" '/Number Of Drives/{print $2}' | uniq`
+if [ $NUMDRIVES -eq 4 ]; then
+  /usr/bin/MegaCli -CfgClr -a0
+  /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -sz100GB -a0
+  /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -a0
+fi
+if [ $NUMDRIVES -eq 6 ]; then
   /usr/bin/MegaCli -CfgClr -a0
   /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -sz100GB -a0
   /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -a0
+fi
 
+# Configure BIOS and BMC settings
+PLATFORM=`/opt/dell/pec/setupbios platform`
+if [ $PLATFORM == 'C6220' ]; then
   /opt/dell/pec/bmc nic_mode set dedicated
   /opt/dell/pec/bmc set_chassis_power_cap disable
   /opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
@@ -80,12 +88,6 @@ if [ $PLATFORM == 'C6220' ]; then
 fi
 
 if [ $PLATFORM == 'C6100' ]; then
-  # configure the LSI RAID 
-  # TODO - determine the # of disks programatically and adjust as needed i.e. for c6100 with 4 disks
-  /usr/bin/MegaCli -CfgClr -a0
-  /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -sz100GB -a0
-  /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -a0
-
   /opt/dell/pec/bmc nic_mode set dedicated
   /opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
   /opt/dell/pec/setupbios setting set hyperthreading_tech enabled
