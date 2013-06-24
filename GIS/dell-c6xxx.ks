@@ -65,14 +65,14 @@ dell-pec-pecagent
 /sbin/chkconfig ipmi on
 
 cat << '__HERE__' > /etc/rc.local
-# configure the LSI RAID 
-/usr/bin/MegaCli -CfgClr -a0
-/usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -sz100GB -a0
-/usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -a0
-
 # Configure BIOS and BMC settings
 PLATFORM=`/opt/dell/pec/setupbios platform`
 if [ $PLATFORM == 'C6220' ]; then
+  # configure the LSI RAID 
+  /usr/bin/MegaCli -CfgClr -a0
+  /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -sz100GB -a0
+  /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -a0
+
   /opt/dell/pec/bmc nic_mode set dedicated
   /opt/dell/pec/bmc set_chassis_power_cap disable
   /opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
@@ -80,11 +80,17 @@ if [ $PLATFORM == 'C6220' ]; then
 fi
 
 if [ $PLATFORM == 'C6100' ]; then
+  # configure the LSI RAID 
+  # TODO - determine the # of disks programatically and adjust as needed i.e. for c6100 with 4 disks
+  /usr/bin/MegaCli -CfgClr -a0
+  /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -sz100GB -a0
+  /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -a0
+
   /opt/dell/pec/bmc nic_mode set dedicated
   /opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
   /opt/dell/pec/setupbios setting set hyperthreading_tech enabled
   /opt/dell/pec/setupbios setting set remote_access enabled
-  /opt/dell/pec/setupbios setting set terminal_type vt100
+  /opt/dell/pec/setupbios setting set terminal_type vt_100
   /opt/dell/pec/setupbios setting set serial_port_number COM2
 fi
 
