@@ -84,6 +84,8 @@ if [ $PLATFORM == 'C6100' ]; then
   /opt/dell/pec/bmc attr set poweron_stagger_ac_recovery 1
   /opt/dell/pec/setupbios setting set hyperthreading_tech enabled
   /opt/dell/pec/setupbios setting set remote_access enabled
+  /opt/dell/pec/setupbios setting set terminal_type vt100
+  /opt/dell/pec/setupbios setting set serial_port_number COM2
 fi
 
 sleep 5
