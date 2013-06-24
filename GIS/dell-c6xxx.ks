@@ -66,7 +66,7 @@ dell-pec-pecagent
 
 cat << '__HERE__' > /etc/rc.local
 # configure the LSI RAID based on the # of drives (currently either 4 or 6) 
-NUMDRIVES=`/illumina/GIS/tools/MegaCli -ldinfo -lall -a0 | awk -F ":" '/Number Of Drives/{print $2}' | uniq`
+NUMDRIVES=`/usr/bin/MegaCli -ldinfo -lall -a0 | awk -F ":" '/Number Of Drives/{print $2}' | uniq`
 if [ $NUMDRIVES -eq 4 ]; then
   /usr/bin/MegaCli -CfgClr -a0
   /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -sz100GB -a0
