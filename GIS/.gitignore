@@ -1,2 +1,2 @@
 # has the bind password hardcoded...
-ldapgroups.py
+sge_acl_from_ad.py
