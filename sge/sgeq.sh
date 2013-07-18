@@ -6,4 +6,6 @@ if [ -n "$ERROR" ]; then
   for q in $ERROR; do
     echo "1 SGE_alarm - $ERROR is in error"
   done
+else
+  echo "0 SGE_alarm - all queues are normal"
 fi
