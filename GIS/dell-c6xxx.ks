@@ -66,16 +66,20 @@ dell-pec-pecagent
 
 cat << '__HERE__' > /etc/rc.local
 # configure the LSI RAID based on the # of drives (currently either 4 or 6) 
-NUMDRIVES=`/usr/bin/MegaCli -ldinfo -lall -a0 | awk -F ":" '/Number Of Drives/{print $2}' | uniq`
-if [ $NUMDRIVES -eq 4 ]; then
-  /usr/bin/MegaCli -CfgClr -a0
-  /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -sz100GB -a0
-  /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -a0
-fi
-if [ $NUMDRIVES -eq 6 ]; then
-  /usr/bin/MegaCli -CfgClr -a0
-  /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -sz100GB -a0
-  /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -a0
+# if there are already 2 logical volumes, assume the RAID has already been configured
+NUM_PV=`/usr/bin/MegaCli -ldinfo -lall -a0 | awk -F ":" '/Number Of Drives/{print $2}' | uniq`
+NUM_LD=`/usr/bin/MegaCli -ldinfo -lall -a0 | grep "Target Id" | wc -l`
+if [ $NUM_LD -eq 2 ]; then
+  if [ $NUM_PV -eq 4 ]; then
+    /usr/bin/MegaCli -CfgClr -a0
+    /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -sz100GB -a0
+    /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -a0
+  fi
+  if [ $NUM_PV -eq 6 ]; then
+    /usr/bin/MegaCli -CfgClr -a0
+    /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -sz100GB -a0
+    /usr/bin/MegaCli -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -a0
+  fi
 fi
 
 # Configure BIOS and BMC settings
