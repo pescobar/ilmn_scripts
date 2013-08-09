@@ -1,0 +1,40 @@
+#!/bin/bash
+
+PEC=/opt/dell/pec
+MEGA=/opt/megacli/MegaCli
+export BMCTOOL_IPMITOOL_CMD=/cm/local/apps/ipmitool/current/ipmitool
+
+# configure the LSI RAID based on the # of drives (currently either 4 or 6) 
+# if there are already 2 logical volumes, assume the RAID has already been configured
+NUM_PV=`$MEGA -adpallinfo -aall | awk -F ":" '/  Disks/{print $2}'`
+NUM_LD=`$MEGA -ldinfo -lall -a0 | grep "Target Id" | wc -l`
+if [ $NUM_LD -ne 2 ]; then
+  if [ $NUM_PV -eq 4 ]; then
+    $MEGA -CfgClr -a0
+    $MEGA -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -sz100GB -a0
+    $MEGA -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3] -a0
+  fi
+  if [ $NUM_PV -eq 6 ]; then
+    $MEGA -CfgClr -a0
+    $MEGA -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -sz100GB -a0
+    $MEGA -CfgLdAdd -r5[252:0, 252:1, 252:2, 252:3, 252:4, 252:5] -a0
+  fi
+fi
+
+# Configure BIOS and BMC settings based on platform
+PLATFORM=`$PEC/setupbios platform`
+if [ $PLATFORM == 'C6220' ]; then
+  $PEC/bmc nic_mode set dedicated
+  $PEC/bmc set_chassis_power_cap disable
+  $PEC/bmc attr set poweron_stagger_ac_recovery 1
+  $PEC/setupbios setting set ioat_dma_engine enabled
+fi
+
+if [ $PLATFORM == 'C6100' ]; then
+  $PEC/bmc nic_mode set dedicated
+  $PEC/bmc attr set poweron_stagger_ac_recovery 1
+  $PEC/setupbios setting set hyperthreading_tech enabled
+  $PEC/setupbios setting set remote_access enabled
+  $PEC/setupbios setting set terminal_type vt_100
+  $PEC/setupbios setting set serial_port_number COM2
+fi

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+FSTAB=/localdisk/etc/fstab
+ISI=ussd-prd-isi01
+
+if [ ! -d /localdisk/illumina ]; then
+  mkdir /localdisk/illumina
+fi
+
+# mount Isilon "zone" by rack location
+case $CMD_RACK in
+  B3)
+    echo "${ISI}e:/ifs/illumina	/illumina	nfs	defaults,intr	0 0" >> $FSTAB
+    echo "${ISI}e:/ifs/home	/home	nfs	defaults,intr	0 0" >> $FSTAB
+    ;;
+  B5)
+    echo "${ISI}b:/ifs/illumina	/illumina	nfs	defaults,intr	0 0" >> $FSTAB
+    echo "${ISI}b:/ifs/home	/home	nfs	defaults,intr	0 0" >> $FSTAB
+    ;;
+  *)
+    echo "${ISI}:/ifs/illumina	/illumina	nfs	defaults,intr	0 0" >> $FSTAB
+    echo "${ISI}:/ifs/home	/home	nfs	defaults,intr	0 0" >> $FSTAB
+    ;;
+esac
