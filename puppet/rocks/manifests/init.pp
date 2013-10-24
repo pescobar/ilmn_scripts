@@ -1,0 +1,3 @@
+class rocks {
+  include extend
+}
